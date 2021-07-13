@@ -105,10 +105,17 @@ public class SellerDaoJDBC implements SellerDao {
 			
 			
 			if (rs.next()) {
-				Department dep = new Department();
-				dep.setId(rs.getInt("DepartmentId"));
-				dep.setName(rs.getString("DepName"));
+				// Estamos criando funções para melhorar o código
+				// e possibilitar reutilização de instanciação:
+			
+				//Department dep = new Department();
+				//dep.setId(rs.getInt("DepartmentId"));
+				//dep.setName(rs.getString("DepName"));
 
+				Department dep = instantiateDepartment(rs);
+				
+				
+				
 				// Esse if é justamente para testar se veio algum resultado.
 				// Se não tiver vindo nada, esse rs.next vai dar falso.
 				// Eu vou pular esse if aqui e vou retornar nulo, 
@@ -124,17 +131,22 @@ public class SellerDaoJDBC implements SellerDao {
 				// Agora vamos ter que criar o objeto Seller
 				// Com os dados que vieram da tabela
 				// E inclusive apontando para o objeto Department.
+
 				
-				Seller obj = new Seller();
-				obj.setId(rs.getInt("Id"));
-				obj.setName(rs.getString("Name"));
-				obj.setEmail(rs.getString("Email"));
-				obj.setBaseSalary(rs.getDouble("BaseSalary"));
-				obj.setBirthDate(rs.getDate("BirthDate"));
+				// Estamos criando funções para melhorar o código
+				// e possibilitar reutilização de instanciação:
+
+				Seller obj = instantiateSeller(rs, dep);
+				//Seller obj = new Seller();
+				//obj.setId(rs.getInt("Id"));
+				//obj.setName(rs.getString("Name"));
+				//obj.setEmail(rs.getString("Email"));
+				//obj.setBaseSalary(rs.getDouble("BaseSalary"));
+				//obj.setBirthDate(rs.getDate("BirthDate"));
 				// Aqui para fazer o department
 				// Você vai querer o objeto montado:
 				// Por isso vamos usar o dep que montamos acima!
-				obj.setDepartment(dep);
+				//obj.setDepartment(dep);
 				
 				// Aqui criamos nosso objeto Seller com todos os 
 				// atributos já definidos
@@ -156,6 +168,32 @@ public class SellerDaoJDBC implements SellerDao {
 			// Deixe a conexão aberta, porque o mesmo objeto DAO
 			// ele pode servir para fazer mais de uma operação.
 		}
+	}
+
+	private Seller instantiateSeller(ResultSet rs, Department dep) throws SQLException {
+		Seller obj = new Seller();
+		// aqui não vamos tratar a exceção, porque lá em cima já estamos tratando.
+		// Então, nesse método auxiliar aqui.
+		// Eu simplesmente vou propagar a exceção:
+
+		obj.setId(rs.getInt("Id"));
+		obj.setName(rs.getString("Name"));
+		obj.setEmail(rs.getString("Email"));
+		obj.setBaseSalary(rs.getDouble("BaseSalary"));
+		obj.setBirthDate(rs.getDate("BirthDate"));
+		obj.setDepartment(dep);
+		return obj;
+	}
+
+	private Department instantiateDepartment(ResultSet rs) throws SQLException {
+		Department dep = new Department();
+		// aqui não vamos tratar a exceção, porque lá em cima já estamos tratando.
+		// Então, nesse método auxiliar aqui.
+		// Eu simplesmente vou propagar a exceção:
+		
+		dep.setId(rs.getInt("DepartmentId"));
+		dep.setName(rs.getString("DepName"));	
+		return dep;
 	}
 
 	@Override

@@ -11,7 +11,7 @@ public interface DepartmentDao {
 	// esse objeto que eu enviar como parâmetro de entrada.
 	void update(Department obj);
 	void deleteById(Integer id);
-	Department findByid(Integer id);
+	Department findById(Integer id);
 	// Essa operação vai pegar esse id,
 	// Consultar no banco de dados o objeto com esse id
 	// Se existir, vai retornar o objeto

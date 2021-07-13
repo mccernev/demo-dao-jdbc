@@ -1,5 +1,6 @@
 package model.dao;
 
+import db.DB;
 import model.dao.impl.SellerDaoJDBC;
 
 public class DaoFactory {
@@ -12,7 +13,7 @@ public class DaoFactory {
 	public static SellerDao createSellerDao() {
 		// E como será a implementação dela?
 		// Ela vai retornar um novo SellerDaoJDBC.
-		return new SellerDaoJDBC();
+		return new SellerDaoJDBC(DB.getConnection());
 		// Desssa forma, a minha classe, ela vai expor um método
 		// que retorna o tipo da interface (SellerDao)
 		// Mas internamente ela vai intanciar uma implementação: SellerDaoJDBC

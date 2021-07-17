@@ -1,10 +1,7 @@
 package application;
 
-
-
 import java.util.Date;
 import java.util.List;
-
 import model.dao.DaoFactory;
 import model.dao.SellerDao;
 import model.entities.Department;
@@ -26,7 +23,6 @@ public class Program {
 		for (Seller obj: list) {
 			System.out.println(obj);
 		}
-		
 
 		System.out.println("\n=== TEST 3: seller findAll ====");
 		list = sellerDao.findAll();
@@ -34,9 +30,8 @@ public class Program {
 			System.out.println(obj);
 		}
 
-		
 		System.out.println("\n=== TEST 4: seller insert ====");
-// 		// Para testar a inserção vou criar um novo objeto:
+ 		// Para testar a inserção vou criar um novo objeto:
 		// Para simplificar, na birthDate vou colocar uma nova data
 		// No department vou aproveitar o objeto instanciado mais acima no código:
 		// Dúvida, neste caso usar o date.util ou o date.sql?:
@@ -45,8 +40,18 @@ public class Program {
 		Seller newSeller = new Seller(null, "Greg", "greg@gmail.com", new Date(), 4000.0, department);
 		// Para inserir este novo objeto:
 		sellerDao.insert(newSeller);
-		System.out.println("Inserted! new id = " + newSeller.getId());
+		System.out.println("Inserted! new id = " + newSeller.getId());		
 		
-		}
-		
+		System.out.println("\n=== TEST 5: seller update ====");
+		// para testar a função de update, vamos usar a nossa variável
+		// seller para receber o vendedor 1;
+		// em seguida vamos fazer algumas alterações:
+		seller = sellerDao.findById(1);
+		seller.setName("Martha Waine");
+		// Agora vamos salvar esse vendedor, atualizando os dados dele:
+		sellerDao.update(seller);
+		System.out.println("Update completed");
+
+	}
+
 }

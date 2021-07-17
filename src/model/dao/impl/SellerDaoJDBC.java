@@ -39,53 +39,70 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void insert(Seller obj) {
-		PreparedStatement st  = null;
-		
+		PreparedStatement st = null;
+
 		try {
 			st = conn.prepareStatement(
-						"INSERT INTO seller "
-						+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
-						+ "VALUES "
-						+ "(?, ?, ?, ?, ?)",
-						// Aqui estamos colocando um comando para ele retornar o 
-						Statement.RETURN_GENERATED_KEYS);
-			
-			st.setString(1,obj.getName());
-			st.setString(2,obj.getEmail());
+					"INSERT INTO seller " 
+					+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) " 
+					+ "VALUES "
+					+ "(?, ?, ?, ?, ?)",
+					// Aqui estamos colocando um comando para ele retornar o
+					Statement.RETURN_GENERATED_KEYS);
+
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getEmail());
 			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
 			st.setDouble(4, obj.getBaseSalary());
-			//st.setDouble(4, obj.getBaseSalary());
+			// st.setDouble(4, obj.getBaseSalary());
 			st.setInt(5, obj.getDepartment().getId());
-	
+
 			int rowsAffected = st.executeUpdate();
-			
+
 			if (rowsAffected > 0) {
 				// Significa que ele inseriu o registro
 				ResultSet rs = st.getGeneratedKeys();
-				if (rs.next()){
+				if (rs.next()) {
 					int id = rs.getInt(1);
 					// vou atribuir o id ao objeto
 					// para que ele já fique populado:
 					obj.setId(id);
 				}
 				DB.closeResultSet(rs);
-			}
-			else {
+			} else {
 				throw new DbException("unexpected error! No rows affected!");
 			}
-		} 
-		catch (SQLException e){
+		} catch (SQLException e) {
 			throw new DbException(e.getMessage());
-		}
-		finally {
+		} finally {
 			DB.closeStatement(st);
 		}
 	}
 
 	@Override
 	public void update(Seller obj) {
-		// TODO Auto-generated method stub
+		PreparedStatement st = null;
 
+		try {
+			st = conn.prepareStatement(
+					"UPDATE seller "
+					+ "SET Name = ?, Email = ?, BirthDate = ?, BaseSalary = ?, DepartmentId = ? " 
+					+ " WHERE Id = ?");
+
+			st.setString(1, obj.getName());
+			st.setString(2, obj.getEmail());
+			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+			st.setDouble(4, obj.getBaseSalary());
+			st.setInt(5, obj.getDepartment().getId());
+			st.setInt(6, obj.getId());
+
+			st.executeUpdate();
+
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
@@ -109,10 +126,8 @@ public class SellerDaoJDBC implements SellerDao {
 
 					// Aqui vamos colocar o comando SQL:
 
-					"SELECT seller.*,department.Name as DepName " 
-					+ "FROM seller INNER JOIN department "
-					+ "ON seller.DepartmentId = department.Id " 
-					+ "WHERE seller.Id = ?");
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "WHERE seller.Id = ?");
 
 			// Agora vamos configurar esse campo ?:
 
@@ -243,11 +258,10 @@ public class SellerDaoJDBC implements SellerDao {
 		try {
 			st = conn.prepareStatement(
 
-					"SELECT seller.*,department.Name as DepName " 
-					+ "FROM seller INNER JOIN department "
-					+ "ON seller.DepartmentId = department.Id ");
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id ");
 
-					rs = st.executeQuery();
+			rs = st.executeQuery();
 
 			List<Seller> list = new ArrayList<>();
 			// Para controlar a não repetição de departament

@@ -68,8 +68,10 @@ public class SellerDaoJDBC implements SellerDao {
 
 					// Aqui vamos colocar o comando SQL:
 
-					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
-							+ "ON seller.DepartmentId = department.Id " + "WHERE seller.Id = ?");
+					"SELECT seller.*,department.Name as DepName " 
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id " 
+					+ "WHERE seller.Id = ?");
 
 			// Agora vamos configurar esse campo ?:
 
@@ -194,8 +196,55 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public List<Seller> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+		PreparedStatement st = null;
+		ResultSet rs = null;
+
+		try {
+			st = conn.prepareStatement(
+
+					"SELECT seller.*,department.Name as DepName " 
+					+ "FROM seller INNER JOIN department "
+					+ "ON seller.DepartmentId = department.Id ");
+
+					rs = st.executeQuery();
+
+			List<Seller> list = new ArrayList<>();
+			// Para controlar a não repetição de departament
+			// vamos utilizar a estrutura map
+			// que é aquela estrtura de chave/valor:
+
+			Map<Integer, Department> map = new HashMap<>();
+			// Aqui criei um map vazio.
+			// Vou guardar dentro dele qualquer department que eu instanciar.
+
+			while (rs.next()) {
+				// A cada vez que passar aqui, vou ter
+				// que testar se o Department já existe.
+				// Como faço isso, no meu map eu tento buscar
+				// com o método get, um Department que tem esse id (rs.getInt(DepartmentId"):
+				Department dep = map.get(rs.getInt("DepartmentId"));
+				// Se não existir, esse map.get vai retornar nullo
+				// Então se for nulo, aí sim eu vou instanciar o Departament.
+				if (dep == null) {
+					dep = instantiateDepartment(rs);
+					// Agora vou salvar este department dentro do meu map
+					// para que da próxima vez, eu possa fazer a verificação
+					// e ver que ele já existe, para não criar outro.
+					map.put(rs.getInt("DepartmentId"), dep);
+				}
+
+				Seller obj = instantiateSeller(rs, dep);
+				list.add(obj);
+			}
+			return list;
+
+		} catch (SQLException e) {
+			throw new DbException(e.getMessage());
+		} finally {
+			DB.closeStatement(st);
+			DB.closeResultSet(rs);
+		}
+
 	}
 
 	@Override
@@ -205,43 +254,38 @@ public class SellerDaoJDBC implements SellerDao {
 
 		try {
 			st = conn.prepareStatement(
-					
-					"SELECT seller.*,department.Name as DepName "
-					+ "FROM seller INNER JOIN department "
-					+ "ON seller.DepartmentId = department.Id "
-					+ "WHERE DepartmentId = ? "
-					+ "ORDER BY Name");
-		
-				
+
+					"SELECT seller.*,department.Name as DepName " + "FROM seller INNER JOIN department "
+							+ "ON seller.DepartmentId = department.Id " + "WHERE DepartmentId = ? " + "ORDER BY Name");
+
 			st.setInt(1, department.getId());
 			rs = st.executeQuery();
 
 			List<Seller> list = new ArrayList<>();
-				 // Para controlar a não repetição de departament
-				 // vamos utilizar a estrutura map
-				 // que é aquela estrtura de chave/valor:
-				 
+			// Para controlar a não repetição de departament
+			// vamos utilizar a estrutura map
+			// que é aquela estrtura de chave/valor:
+
 			Map<Integer, Department> map = new HashMap<>();
 			// Aqui criei um map vazio.
 			// Vou guardar dentro dele qualquer department que eu instanciar.
-			
-			
-			while (rs.next()) {	 
-				// A cada vez que passar aqui, vou ter 
+
+			while (rs.next()) {
+				// A cada vez que passar aqui, vou ter
 				// que testar se o Department já existe.
 				// Como faço isso, no meu map eu tento buscar
 				// com o método get, um Department que tem esse id (rs.getInt(DepartmentId"):
-				Department dep = map.get(rs.getInt("DepartmentId"));  
+				Department dep = map.get(rs.getInt("DepartmentId"));
 				// Se não existir, esse map.get vai retornar nullo
-				// Então se for nulo, aí sim eu vou instanciar o Departament. 
-				if (dep == null){
+				// Então se for nulo, aí sim eu vou instanciar o Departament.
+				if (dep == null) {
 					dep = instantiateDepartment(rs);
 					// Agora vou salvar este department dentro do meu map
 					// para que da próxima vez, eu possa fazer a verificação
 					// e ver que ele já existe, para não criar outro.
 					map.put(rs.getInt("DepartmentId"), dep);
 				}
-				
+
 				Seller obj = instantiateSeller(rs, dep);
 				list.add(obj);
 			}

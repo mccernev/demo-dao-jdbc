@@ -2,6 +2,7 @@ package application;
 
 
 
+import java.util.Date;
 import java.util.List;
 
 import model.dao.DaoFactory;
@@ -34,12 +35,18 @@ public class Program {
 		}
 
 		
+		System.out.println("\n=== TEST 4: seller insert ====");
+// 		// Para testar a inserção vou criar um novo objeto:
+		// Para simplificar, na birthDate vou colocar uma nova data
+		// No department vou aproveitar o objeto instanciado mais acima no código:
+		// Dúvida, neste caso usar o date.util ou o date.sql?:
+		//É o javautil.date!
 		
+		Seller newSeller = new Seller(null, "Greg", "greg@gmail.com", new Date(), 4000.0, department);
+		// Para inserir este novo objeto:
+		sellerDao.insert(newSeller);
+		System.out.println("Inserted! new id = " + newSeller.getId());
 		
+		}
 		
-		System.out.println(); 
-		
-
-	
-	}
 }

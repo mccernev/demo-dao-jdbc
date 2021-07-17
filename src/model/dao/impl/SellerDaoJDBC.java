@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,47 @@ public class SellerDaoJDBC implements SellerDao {
 
 	@Override
 	public void insert(Seller obj) {
-		// TODO Auto-generated method stub
+		PreparedStatement st  = null;
+		
+		try {
+			st = conn.prepareStatement(
+						"INSERT INTO seller "
+						+ "(Name, Email, BirthDate, BaseSalary, DepartmentId) "
+						+ "VALUES "
+						+ "(?, ?, ?, ?, ?)",
+						// Aqui estamos colocando um comando para ele retornar o 
+						Statement.RETURN_GENERATED_KEYS);
+			
+			st.setString(1,obj.getName());
+			st.setString(2,obj.getEmail());
+			st.setDate(3, new java.sql.Date(obj.getBirthDate().getTime()));
+			st.setDouble(4, obj.getBaseSalary());
+			//st.setDouble(4, obj.getBaseSalary());
+			st.setInt(5, obj.getDepartment().getId());
+	
+			int rowsAffected = st.executeUpdate();
+			
+			if (rowsAffected > 0) {
+				// Significa que ele inseriu o registro
+				ResultSet rs = st.getGeneratedKeys();
+				if (rs.next()){
+					int id = rs.getInt(1);
+					// vou atribuir o id ao objeto
+					// para que ele já fique populado:
+					obj.setId(id);
+				}
+				DB.closeResultSet(rs);
+			}
+			else {
+				throw new DbException("unexpected error! No rows affected!");
+			}
+		} 
+		catch (SQLException e){
+			throw new DbException(e.getMessage());
+		}
+		finally {
+			DB.closeStatement(st);
+		}
 	}
 
 	@Override
